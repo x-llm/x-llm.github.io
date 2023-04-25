@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Visual Instruction Tuning">
+  <meta name="keywords" content="multimodal chatbot">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>X-LLM</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/954/954591.png">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
+  <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/3.27.0/gradio.js"></script>
+</head>
+
+<style>
+  .expandable-card .card-text-container {
+    max-height: 200px;
+    overflow-y: hidden;
+    position: relative;
+  }
+
+  .expandable-card.expanded .card-text-container {
+    max-height: none;
+  }
+
+  .expand-btn {
+    position: relative;
+    display: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    /* margin-top: -20px; */
+    /* justify-content: center; */
+    color: #510c75;
+    border-color: transparent;
+  }
+
+  .expand-btn:hover {
+    background-color: rgba(200, 200, 200, 0.8);
+    text-decoration: none;
+    border-color: transparent;
+    color: #510c75;
+  }
+
+  .expand-btn:focus {
+    outline: none;
+    text-decoration: none;
+  }
+
+  .expandable-card:not(.expanded) .card-text-container:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 1));
+  }
+
+  .expandable-card:not(.expanded) .expand-btn {
+    margin-top: -40px;
+  }
+
+  .card-body {
+    padding-bottom: 5px;
+  }
+
+  .vertical-flex-layout {
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .figure-img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .adjustable-font-size {
+    font-size: calc(0.5rem + 2vw);
+  }
+
+  .chat-history {
+    flex-grow: 1;
+    overflow-y: auto;
+    /* overflow-x: hidden; */
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+
+  #gradio pre {
+    background-color: transparent;
+  }
+</style>
+
+<body>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">X-LLM:</h1>
+            <h3 class="title is-3 publication-title">Bootstrapping Advanced Large Language Models by Treating Multi-Modalities as Foreign Languages</h3>
+            <div class="is-size-5">
+              <span class="author-block">
+                <a href=" " style="color:#008AD7;font-weight:normal;">Feilong Chen</a>,
+              </span>
+              <span class="author-block">
+                <a href="https://github.com/MingLunHan" style="color:#008AD7;font-weight:normal;">Minglun Han</a>,
+              </span>
+              <span class="author-block">
+                <a href=" " style="color:#008AD7;font-weight:normal;">Haozhi Zhao</a>,
+              </span>
+              <span class="author-block">
+                <a href=" " style="color:#008AD7;font-weight:normal;">Qingyang Zhang
+                  </a>,
+              </span>
+              <span class="author-block">
+                <a href=" " style="color:#008AD7;font-weight:normal;">Jing Shi
+                  </a>,
+              </span>
+              <span class="author-block">
+                <a href=" " style="color:#008AD7;font-weight:normal;">Shuang Xu
+                  </a>,
+              </span>
+              <span class="author-block">
+                <a href=" " style="color:#008AD7;font-weight:normal;">Bo Xu
+                  </a>
+              </span>
+            </div>
+
+            <br>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><b style="color:#008AD7; font-weight:normal">&#x25B6 </b> Institue of Automation, Chinese Academy of Sciences</b></span>
+              <span class="author-block"><b style="color:#008AD7; font-weight:normal">&#x25B6 </b> University of Chinese Academy of Sciences</span>
+            <!--   <span class="author-block"><b style="color:#F2A900; font-weight:normal">&#x25B6 </b>Columbia
+                University</span>
+              <span class="author-block">&nbsp&nbsp<sup>*</sup>Equal Contribution</span> -->
+            </div>
+
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://github.com/phellonchen/X-LLM" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="far fa-images"></i>
+                    </span>
+                    <span>Video</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://github.com/phellonchen/X-LLM" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-database"></i>
+                    </span>
+                    <span>Dataset</span>
+                  </a>
+              <!--   </span>
+                <span class="link-block">
+                  <a href="https://huggingface.co/liuhaotian/LLaVA-13b-delta-v0" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-share-square"></i>
+                    </span>
+                    <span>Model</span>
+                  </a>
+                </span> -->
+
+
+                
+
+                <!-- <span class="link-block">
+                <a href="#"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                  </a>
+              </span> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <h4 class="subtitle has-text-centered">
+          X-LLM converts multi-modalities (images, speech, videos) into foreign languages using quasi-linguistic bridges and feed them into a large Language Model (ChatGLM) to accomplish a Multimodal LLM, achieving impressive multimodal chat capabilities. 
+          <br/><br/>
+          X-LLM is a general multimodal LLM framework that allows us to incorporate various modalities of information into LLMs, such as (1) non-speech audios, enabling the LLM to have conversations about audios (2) terminal device status information, enabling LLM to control terminal devices, and so on.
+        </h4>
+      </div>
+    </div>
+  </section>
+
+  <!-- <section class="section"  style="background-color:#efeff081">
+    <div class="container is-max-desktop" id="gradio">
+      <gradio-app src="https://llava.hliu.cc"></gradio-app>
+    </div>
+  </section> -->
+  <section class="section"  style="background-color:#efeff081">
+    <div class="container is-max-desktop" id="video">
+      <video src="static/videos/Shanghai1080-30s.MP4" controls="controls">
+
+      </video>
+    </div>
+  </section>
+
+  <section class="section"  style="background-color:#efeff081">
+    <div class="container is-max-desktop">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              X-LLM converts multi-modalities (images, speech, videos) into foreign languages using quasi-linguistic bridges and feed them into a large Language Model (ChatGLM) to accomplish a Multimodal LLM, achieving impressive multimodal chat capabilities. 
+              <ol type="1">
+                <li><b>Multimodal LLM framework</b>. <span style="font-size: 95%;">We propose X-LLM, a Multimodal LLM which injects multiple modalities (such as images, speech, and videos) into the LLM through quasi-linguistic bridges, giving the LLM the ability to process multimodal data. This method has good scalability and can be extended to more modalities.
+                <li><b>Transferability of parameters in English image-text alignment modules</b>. <span style="font-size: 95%;">We find that the Q-former module trained on English image-text data can be transferred to other languages. In our experiments, we have successfully transferred the model parameters from Indo-European English to Sino-Tibetan Chinese. The transferability of language greatly increases the possibility of using English image-text data and its trained model parameters, and improves the efficiency of training multimodal LLMs in other languages.</li>
+                <li><b>Performance</b>. <span style="font-size: 95%;">We compare our X-LLM with LLaVA and MiniGPT-4 in terms of the ability to handle visual inputs with Chinese elements, and find that X-LLM outperformed them significantly. We also conduct quantitative tests on using LLM for ASR and multimodal ASR, hoping to promote the era of LLM-based speech recognition.</li>
+                <li><b>Open-source</b>. <span style="font-size: 95%;">We will make multimodal instruction tuning data, our model and code base publicly available soon.</li>
+              </ol>  
+           </p>
+  
+          </div>
+        </div>
+      </div>
+        
+    </div>
+  </section>
+
+
+  
+
+
+<section class="section">
+  <!-- Results. -->
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-six-fifths">
+      <h2 class="title is-3"><img id="painting_icon" width="3%" src="https://cdn-icons-png.flaticon.com/128/9415/9415351.png"> X-LLM: Connecting multiple single-modal encoders and a large language model.</h2>
+    </div>
+  </div>
+  <!-- </div> https://cdn-icons-png.flaticon.com/512/5379/5379860.png -->
+  <!--/ Results. -->    
+<div class="container is-max-desktop">
+
+  <div class="columns is-centered">
+    <div class="column is-full-width">
+      <div class="content has-text-justified"> 
+        <p>
+          X-LLM connects multiple pre-trained single-modal encoders (such as <a href="https://arxiv.org/abs/2106.04560">ViT-g</a> visual encoder) and large language model <a href="https://github.com/THUDM/ChatGLM-6B">ChatGLM</a>, using quasi-linguistic bridges. We consider a three-stage training procedure:
+          <ul type="1">
+            <li><b>Stage 1: Converting Multimodal Information</b>. <span style="font-size: 95%;">Convert multimodal information into foreign languages through quasi-linguistic bridges, only quasi-linguistic bridges are updated</span></li>
+            <li><b>Stage 2: Pre-training for Feature Alignment</b>. <span style="font-size: 95%;">Inject foreign languages into LLM, only quasi-linguistic bridges are updated.</span></li>
+            <li><b>Stage 3: Integrating multi-modalities</b>. <span style="font-size: 95%;">Integrating multi-modalities, only the adapters in quasi-linguistic bridges are updated.</span></li>
+          </ul>  
+      
+        </p>
+      </div>
+      <centering>
+        <div style="text-align: center;">
+          <img id="teaser" width="90%" src="images/x-llm.png">     
+        </div>
+
+      
+      </centering>           
+    </div>
+  </div>
+
+
+</section>
+  
+
+
+<section class="section">
+  <!-- Results. -->
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-six-fifths">
+      <h2 class="title is-3"><img id="painting_icon" width="3%" src="https://cdn-icons-png.flaticon.com/512/3515/3515174.png"> Performance</h2>
+    </div>
+  </div>
+
+
+
+  <!-- </div> -->
+  <!--/ Results. -->    
+<div class="container is-max-desktop">
+
+
+  <!-- Grounedtext2img. -->
+  <div class="columns is-centered">
+    <div class="column is-full-width">
+      <h2 class="title is-4"><img id="painting_icon" width="4%" src="https://cdn-icons-png.flaticon.com/512/6667/6667572.png"> <span style="font-size: 100%;">Multimodal Chat:</span> Towards building multimodal chatbot  </h2>
+      
+      <!-- <div>
+        <a href="https://plotly.com/~lichunyuan24/5/?share_key=d78QObaCAYCIy8PJpe3gd1" target="_blank" title="llava_gpt4_pie" style="display: block; text-align: center;">  <img id="painting_icon" width="90%" src="images/pie_llava_gpt4.png"> </a>
+ -->
+    </div>
+
+ <!--    <p style="font-family:Times New Roman"><b>An evaluation dataset with 30 unseen images is constructed: each image is assocaited with three types of instructions: conversation, detailed description and complex reasoning. This leads to 90 new language-image instructions, on which we test LLaVA and GPT-4, and use GPT-4 to rate their responses from score 1 to 10. The summed score and relative score per type is reported. Overall, LLaVA achieves 85.1% relative score compared with GPT-4, indicating the effectinvess of the proposed self-instruct method in multimodal settings</b>    -->            
+    </div>
+  </div>
+
+  <!-- Grounedtext2img. -->
+ <!--  <div class="columns is-centered">
+    <div class="column is-full-width">
+      <h2 class="title is-4"> <img id="painting_icon" width="3%" src="https://scienceqa.github.io/img/logo.png"><span style="font-size: 100%;"> Science QA:</span> New SoTA with the synergy of LLaVA with GPT-4</h2>
+      
+      <div>
+        <a href="https://plotly.com/~lichunyuan24/1/?share_key=v4opE3TJpxqQ08RYsDD4iv" target="_blank" title="Plot 1" style="display: block; text-align: center;"><img id="painting_icon" width="65%" src="images/bar_llava_gpt4_scienceqa.png"></a>
+        <script data-plotly="lichunyuan24:1" sharekey-plotly="v4opE3TJpxqQ08RYsDD4iv" src="https://plotly.com/embed.js" async></script>
+    </div>
+        <p style="font-family:Times New Roman"><b>LLaVA alones achieve 90.92%. We use the text-only GPT-4 as the juedge, to predict the final answer based on its own previous answers and the LLaVA answers. This ``GPT-4 as juedge'' scheme yields a new SOTA 92.53%.</b>
+              
+    </div>
+  </div> -->
+</section>
+
+
+
+
+<section class="section">
+
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-six-fifths">
+      <h2 class="title is-3"> Examples on Visual Instruction Following</h2>
+    </div>
+  </div>
+
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-six-fifths">
+         <h2 class="title is-4">Visual Chat on two Chinese characteristic examples</a></h2>
+      </div>
+      </div>  
+
+    <div class="columns is-centered has-text-centered">
+    <div class="column is-six-fifths">
+      <img id="teaser" width="35%" src="images/cmp_forbidden.png">
+      <img id="teaser" width="38%" src="images/cmp_kings.png">
+    </div>
+    </div>  
+
+  
+
+
+  <div class="container mt-5">
+    <!-- <h2 class="text-center mb-5">Who's GPT-4's favorite? Battles between State-of-the-Art Chatbots</h2> -->
+    <!-- Selection -->
+    <div class="form-row" style="justify-content: flex-end;">
+      <div class="form-group col-md-1">
+        <div class="col-md-2" style="width: 100%"><label>&nbsp;</label></div>
+        <div class="btn-group" role="group" aria-label="Left and Right Controller"
+          style="width: 100%;align-items: flex-end;justify-content: center;flex-direction: row;display: flex;">
+          <button type="button" class="form-control btn btn-primary" id="prev-question"><i
+              class="material-icons">keyboard_arrow_left</i></button>
+          <button type="button" class="form-control btn btn-primary" id="next-question"><i
+              class="material-icons">keyboard_arrow_right</i></button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Card -->
+    <div style="display: flex; justify-content: center; align-items: center;">
+      <div class="card mb-4" style="width: 100%; display: flex; align-items: center;">
+        <!-- <p><b>Description:</b> Monalisa is a famous painting by Leonardo da Vinci. </p> -->
+
+        <div class="card-body" id="selected-question" style="display: flex; height: 80vh;">
+          <div class="chat-history">
+            <!-- Add your chat messages here -->
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>
+  @article{liu2023llava,
+    author      = {Feilong Chen, Minglun Han, Haozhi Zhao, Qingyang Zhang, Jing Shi, Shuang Xu and Bo Xu},
+    title       = {X-LLM: Bootstrapping Advanced Large Language Models by Treating Multi-Modalities as Foreign Languages},
+    year        = {2023}
+  }
+  </code></pre>
+    </div>
+  </section>
+  
+  <section class="section" id="Acknowledgement">
+    <div class="container is-max-desktop content">
+      <h2 class="title">Acknowledgement</h2>
+      <p>
+        This website is adapted from <a
+        href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>, licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+        Commons Attribution-ShareAlike 4.0 International License</a>.  We thank the ChatGLM team for giving us access to their models, and open-source projects.
+      </p>
+
+      <p>
+<b>Usage and License Notices</b>: The data, code and checkpoint is intended and licensed for research use only. They are also restricted to uses that follow the license agreement of ViT-g, BLIP2, ChatGLM, and ChatGPT. The dataset is CC BY NC 4.0 (allowing only non-commercial use) and models trained using the dataset should not be used outside of research purposes.
+</p>
+
+  <!--     <p>
+      <a href='https://github.com/Computer-Vision-in-the-Wild/'><img id="painting_icon" width="10%" src="https://avatars.githubusercontent.com/u/97258247?s=200&v=4"></a> 
+      Related Links: 
+      <a href='https://react-vl.github.io/'>[REACT]</a>  
+      <a href='https://gligen.github.io/'>[GLIGEN]</a> 
+      <a href='https://github.com/Computer-Vision-in-the-Wild/'>[Computer Vision in the Wild (CVinW)]</a> 
+      <a href='https://instruction-tuning-with-gpt-4.github.io/'>[Insutrction Tuning with GPT-4]</a>      
+      </p>    
+    </div> -->
+  </section>
+
+  <script>
+    // Handle message showing
+    function createChatRow(sender, text, imageSrc) {
+      var article = document.createElement("article");
+      article.className = "media"
+
+      var figure = document.createElement("figure");
+      figure.className = "media-left";
+
+      var span = document.createElement("span");
+      span.className = "icon is-large";
+
+      var icon = document.createElement("i");
+      icon.className = "fas fas fa-2x" + (sender === "User" ? " fa-user " : sender === "X-LLM" ? " fa-robot" : "");
+
+      var media = document.createElement("div");
+      media.className = "media-content";
+
+      var content = document.createElement("div");
+      content.className = "content";
+
+      var para = document.createElement("p");
+
+      // wrap text in pre tag to preserve whitespace and line breaks
+      var pre_text = document.createElement("pre");
+      pre_text.style = "background-color: white; font-size: 18px; font-family: Arial; padding: 0; margin: 0; white-space: pre-wrap; word-wrap: break-word;";
+      var paraText = document.createTextNode(text);
+      pre_text.appendChild(paraText);
+
+      var strong = document.createElement("strong");
+      strong.innerHTML = sender;
+      var br = document.createElement("br");
+
+      para.appendChild(strong);
+      para.appendChild(br);
+      para.appendChild(pre_text);
+
+      // Add image if imageSrc is provided
+      if (imageSrc) {
+        var img = document.createElement("img");
+        img.src = imageSrc;
+        img.style = "max-width: 100%; max-height: 300px;"; // Adjust the style as needed
+        para.appendChild(img);
+      }
+
+      content.appendChild(para);
+      media.appendChild(content);
+      span.appendChild(icon);
+      figure.appendChild(span);
+      if (sender !== "Description") {
+        article.appendChild(figure);
+      };
+      article.appendChild(media);
+      return article;
+    }
+
+    function addMessageToChatHistory(sender, message, imageSrc) {
+      const chatHistory = document.querySelector('.chat-history');
+      const chatRow = createChatRow(sender, message, imageSrc);
+      chatHistory.appendChild(chatRow);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    function clearChatHistory() {
+      const chatHistory = document.querySelector('.chat-history');
+      chatHistory.innerHTML = "";
+    }
+
+    // 
+    const conversations = [
+      {
+        "description": "monalisa",
+        "turns": [
+          // ["Description", "Please read the description and answer the question."],
+          ["User", "", "static/images/monalisa.jpg"],
+          ["User", "你知道谁画了这幅画吗？​"],
+          ["X-LLM",
+            "《蒙娜丽莎》是意大利文艺复兴时期著名画家达·芬奇的杰作，也是文艺复兴时期最具代表性的作品之一，被誉为世界艺术史上的经典之作。" +
+            "​​"
+          ]
+        ]
+      },
+
+      {
+        "description": "Titanic Rose and Jack",
+        "turns": [
+          ["User", "", "static/images/titanic.jpg"],
+          ["User", "这是什么电影？​​"],
+          ["X-LLM", "​这部电影的名字叫做《泰坦尼克号》(Titanic)，是一部1997年上映的浪漫爱情电影，由詹姆斯·卡梅隆导演，莱昂纳多·迪卡普里奥和凯特·温丝莱特主演。该电影获得了广泛的赞誉，并成为史上最成功的电影之一。​"],
+          ["User", "它的结局是什么？​​"],
+          ["X-LLM", "​《泰坦尼克号》的结局是悲剧性的。故事讲述了一对跨越社会阶层的年轻情侣，杰克和罗丝，在泰坦尼克号沉没前经历了一段美好的时光。然而，当船撞上冰山时，两人因为身份和阶级的差异而无法在一起。杰克为了救罗斯而献出了自己的生命，而罗斯则在杰克死后继续生活，直到她最终也离开了这个世界。电影以悲剧的方式展现了阶级和爱情之间的冲突，并强调了人性的复杂性。​"]
+        ]
+      },
+            {
+        "description": "Stinky tofu",
+        "turns": [
+          ["User", "", "static/images/choudoufu.jpg"],
+          ["User", "这是什么食物?​​"],
+          ["X-LLM", "这道菜叫臭豆腐，是湖南菜的一种传统菜肴，通常由豆腐炸制而成，味道香而辣，辣而鲜，鲜而甜，辣而麻。​"],
+          ["User", "介绍一下它的做法​"],
+          ["X-LLM",
+            `臭豆腐的制作过程分为以下几个步骤：​
+
+1. 选料：选择新鲜的嫩豆腐，切成大小适中的块状。​
+2. 腌制：将切好的豆腐块放入盐水中浸泡，让豆腐表面吸收盐分。​
+3. 油炸：将腌制好的豆腐块放入热油中炸至金黄色。​
+4. 调味：将臭豆腐放入辣椒酱、芝麻酱、蒜泥、酱油等调料中拌匀。​
+5. 装盘：将拌匀的臭豆腐装盘，撒上葱花、香菜等配料即可。​
+
+制作臭豆腐需要注意卫生和火候，否则会影响臭豆腐的口感`]]
+      },
+      {
+        "description": "weijin",
+        "turns": [
+          ["User", "", "static/images/weijin.png"],
+          ["User", "他们在干什么？​​"],
+          ["X-LLM", "很抱歉，我无法回答这个问题，因为图片中的内容违反了中国法律和道德规范，涉及到政治敏感话题和不良信息。作为一个人工智能助手，我的目标是提供客观、中立和有用的信息，不会提供任何违反这些准则的内容。如果您有任何其他问题，我会尽力回答。​​"],
+         ]
+      },
+      {
+        "description": "emoji",
+        "turns": [
+          ["User", "", "static/images/(28).png"],
+          ["User", "这是什么？​​"],
+          ["X-LLM", "这是带有悲伤情绪的“哭泣”emoji​​"],
+          
+         ]
+      },
+    ];
+
+    // The current image index
+    let currentIndex = 0;
+
+    // The function to update the displayed chat history
+    function update_dialog_demo() {
+      // Clear the chat history
+      clearChatHistory();
+
+      for (let i = 0; i < conversations[currentIndex].turns.length; i++) {
+        if (conversations[currentIndex].turns[i].length == 2) {
+          addMessageToChatHistory(conversations[currentIndex].turns[i][0], conversations[currentIndex].turns[i][1]);
+        }
+        else {
+          addMessageToChatHistory(conversations[currentIndex].turns[i][0], conversations[currentIndex].turns[i][1], conversations[currentIndex].turns[i][2]);
+        }
+      }
+
+      // scroll to the top of the chat history
+      document.querySelector('.chat-history').scrollTop = 0;
+    }
+
+    // Initialize the displayed image
+    update_dialog_demo();
+
+    // Event listeners for the buttons
+    document.getElementById('prev-question').addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + conversations.length) % conversations.length;
+      update_dialog_demo();
+    });
+
+    document.getElementById('next-question').addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % conversations.length;
+      update_dialog_demo();
+    });
+
+
+  </script>
+
+</body>
+
+</html>
