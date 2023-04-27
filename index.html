@@ -226,7 +226,7 @@
     <div class="container is-max-desktop">
       <div class="hero-body">
         <h4 class="subtitle has-text-centered">
-          X-LLM converts multi-modalities (images, speech, videos) into foreign languages using quasi-linguistic bridges and feed them into a large Language Model (ChatGLM) to accomplish a Multimodal LLM, achieving impressive multimodal chat capabilities. 
+          X-LLM converts multi-modalities (images, speech, videos) into foreign languages using X2L interfaces and feed them into a large Language Model (ChatGLM) to accomplish a Multimodal LLM, achieving impressive multimodal chat capabilities. 
           <br/><br/>
           X-LLM is a general multimodal LLM framework that allows us to incorporate various modalities of information into LLMs, such as (1) non-speech audios, enabling the LLM to have conversations about audios (2) terminal device status information, enabling LLM to control terminal devices, and so on.
         </h4>
@@ -255,9 +255,9 @@
           <h2 class="title is-3">Abstract</h2>
           <div class="content has-text-justified">
             <p>
-              X-LLM converts multi-modalities (images, speech, videos) into foreign languages using quasi-linguistic bridges and feed them into a large Language Model (ChatGLM) to accomplish a Multimodal LLM, achieving impressive multimodal chat capabilities. 
+              X-LLM converts multi-modalities (images, speech, videos) into foreign languages using X2L interfaces and feed them into a large Language Model (ChatGLM) to accomplish a Multimodal LLM, achieving impressive multimodal chat capabilities. 
               <ol type="1">
-                <li><b>Multimodal LLM framework</b>. <span style="font-size: 95%;">We propose X-LLM, a Multimodal LLM which injects multiple modalities (such as images, speech, and videos) into the LLM through quasi-linguistic bridges, giving the LLM the ability to process multimodal data. This method has good scalability and can be extended to more modalities.
+                <li><b>Multimodal LLM framework</b>. <span style="font-size: 95%;">We propose X-LLM, a Multimodal LLM which injects multiple modalities (such as images, speech, and videos) into the LLM through X2L interfaces, giving the LLM the ability to process multimodal data. This method has good scalability and can be extended to more modalities.
                 <li><b>Transferability of parameters in English image-text alignment modules</b>. <span style="font-size: 95%;">We find that the Q-former module trained on English image-text data can be transferred to other languages. In our experiments, we have successfully transferred the model parameters from Indo-European English to Sino-Tibetan Chinese. The transferability of language greatly increases the possibility of using English image-text data and its trained model parameters, and improves the efficiency of training multimodal LLMs in other languages.</li>
                 <li><b>Performance</b>. <span style="font-size: 95%;">We compare our X-LLM with LLaVA and MiniGPT-4 in terms of the ability to handle visual inputs with Chinese elements, and find that X-LLM outperformed them significantly. We also conduct quantitative tests on using LLM for ASR and multimodal ASR, hoping to promote the era of LLM-based speech recognition.</li>
                 <li><b>Open-source</b>. <span style="font-size: 95%;">We will make multimodal instruction tuning data, our model and code base publicly available soon.</li>
@@ -290,11 +290,11 @@
     <div class="column is-full-width">
       <div class="content has-text-justified"> 
         <p>
-          X-LLM connects multiple pre-trained single-modal encoders (such as <a href="https://arxiv.org/abs/2106.04560">ViT-g</a> visual encoder) and large language model <a href="https://github.com/THUDM/ChatGLM-6B">ChatGLM</a>, using quasi-linguistic bridges. We consider a three-stage training procedure:
+          X-LLM connects multiple pre-trained single-modal encoders (such as <a href="https://arxiv.org/abs/2106.04560">ViT-g</a> visual encoder) and large language model <a href="https://github.com/THUDM/ChatGLM-6B">ChatGLM</a>, using X2L interfaces. We consider a three-stage training procedure:
           <ul type="1">
             <li><b>Stage 1: Converting Multimodal Information</b>. <span style="font-size: 95%;">Convert multimodal information into foreign languages through quasi-linguistic bridges, only quasi-linguistic bridges are updated</span></li>
-            <li><b>Stage 2: Pre-training for Feature Alignment</b>. <span style="font-size: 95%;">Inject foreign languages into LLM, only quasi-linguistic bridges are updated.</span></li>
-            <li><b>Stage 3: Integrating multi-modalities</b>. <span style="font-size: 95%;">Integrating multi-modalities, only the adapters in quasi-linguistic bridges are updated.</span></li>
+            <li><b>Stage 2: Aligning X2L Representations with the LLM</b>. <span style="font-size: 95%;">Inject foreign languages into LLM, only X2L interfaces are updated.</span></li>
+            <li><b>Stage 3: Integrating Multiple Modalities</b>. <span style="font-size: 95%;">Integrating multi-modalities, only the adapters in X2L interfaces are updated.</span></li>
           </ul>  
       
         </p>
