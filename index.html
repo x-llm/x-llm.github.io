@@ -292,7 +292,7 @@
         <p>
           X-LLM connects multiple pre-trained single-modal encoders (such as <a href="https://arxiv.org/abs/2106.04560">ViT-g</a> visual encoder) and large language model <a href="https://github.com/THUDM/ChatGLM-6B">ChatGLM</a>, using X2L interfaces. We consider a three-stage training procedure:
           <ul type="1">
-            <li><b>Stage 1: Converting Multimodal Information</b>. <span style="font-size: 95%;">Convert multimodal information into foreign languages through quasi-linguistic bridges, only quasi-linguistic bridges are updated</span></li>
+            <li><b>Stage 1: Converting Multimodal Information</b>. <span style="font-size: 95%;">Convert multimodal information into foreign languages through X2L interfaces, only X2L interfaces are updated</span></li>
             <li><b>Stage 2: Aligning X2L Representations with the LLM</b>. <span style="font-size: 95%;">Inject foreign languages into LLM, only X2L interfaces are updated.</span></li>
             <li><b>Stage 3: Integrating Multiple Modalities</b>. <span style="font-size: 95%;">Integrating multi-modalities, only the adapters in X2L interfaces are updated.</span></li>
           </ul>  
@@ -339,7 +339,7 @@
  
     </div>
 
-    <p style="font-family:Times New Roman"><b>An evaluation dataset with 30 unseen images is constructed: each image is assocaited with three types of instructions: conversation, detailed description and complex reasoning. This leads to 90 new language-image instructions, on which we test X-LLM and GPT-4, and use ChatGPT to rate their responses from score 1 to 10. The summed score and relative score per type is reported. Overall, X-LLM achieves 84.5% relative score compared with GPT-4, indicating the effectinvess of the proposed self-instruct method in multimodal settings.</b>               
+    <p style="font-family:Times New Roman"><b>An evaluation dataset with 30 unseen images is constructed: each image is assocaited with three types of instructions: conversation, detailed description and complex reasoning. This leads to 90 new language-image instructions, on which we test X-LLM and GPT-4, and use ChatGPT to rate their responses from score 1 to 10. The summed score and relative score per type is reported. Overall, X-LLM achieves 84.5% relative score compared with GPT-4, indicating the effectinvess of the proposed method in multimodal settings.</b>               
     </div>
   </div>
 
@@ -423,7 +423,7 @@
     <div class="container is-max-desktop content">
       <h2 class="title">BibTeX</h2>
       <pre><code>
-  @article{liu2023llava,
+  @article{chen2023xllm,
     author      = {Feilong Chen, Minglun Han, Haozhi Zhao, Qingyang Zhang, Jing Shi, Shuang Xu and Bo Xu},
     title       = {X-LLM: Bootstrapping Advanced Large Language Models by Treating Multi-Modalities as Foreign Languages},
     year        = {2023}
